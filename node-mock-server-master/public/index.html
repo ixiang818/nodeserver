@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui, viewport-fit=cover">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        /*a {*/
+        /*    pointer-events: none;*/
+        /*}*/
+        .back-div {
+            display: flex;
+            /*background: linear-gradient(180deg, #35C9F2 0%, #009CC7 100%);*/
+            background: #009CC7;
+            height: 3rem;
+        }
+        .back-icon {
+            width: 22px;
+            height: 22px;
+        }
+        .back-info {
+            font-family: Helvetica;
+            font-size: 1.2rem;
+            color: #ffffff;
+            letter-spacing: -0.41px;
+            text-align: left;
+        }
+        .left {
+            text-decoration: none;
+            display: flex;
+            margin-left: 5px;
+            align-items: center;
+        }
+        #content-div {
+            margin: 0 auto;
+            white-space: nowrap;
+        }
+        img{
+            width: 100%;
+        }
+    </style>
+    <script>
+        var xhr = new GetXmlHttpObject(); // Http传输类初始化
+        var urlPath = "http://hk3cvdv00673.oocl.com:6003/osp/api/sr/fullview?srNumber=ESR-00242772&type=DESCRIPTION&mainCategoryCode=EASC";
+        // Http传输类
+        function GetXmlHttpObject() {
+            var xmlHttp=null;
+            try {
+                // Firefox, Opera 8.0+, Safari
+                console.log("XMLHttpRequest");
+                xmlHttp=new XMLHttpRequest();
+            } catch (e) {
+                // Internet Explorer
+                try {
+                    console.log("Msxml2");
+                    xmlHttp=new ActiveXObject("Msxml2.XMLHTTP");
+                } catch (e) {
+                    console.log("Microsoft");
+                    xmlHttp=new ActiveXObject("Microsoft.XMLHTTP");
+                }
+            }
+            return xmlHttp;
+        }
+        // get请求
+        function get_network(){
+            var url = urlPath;
+            xhr.onreadystatechange = toGetProcess;
+            xhr.open("GET", url);
+            xhr.send(null);
+            console.log("url:",url);
+        }
+        // 设置当获XHR对象获取到返回信息后执行以下代码
+        function toGetProcess() {
+            console.log("xhr:",xhr.readyState,xhr.status);
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    res = xhr.responseText;
+                    var obj = eval ("(" + res + ")");
+                    console.log(JSON.stringify(obj))
+                    document.getElementById('content-div').innerHTML = obj.resultData;
+                    parent.test2()
+                }
+            } else {
+                console.log("可能存在跨域问题，解决即可");
+            }
+        }
+        function callPhone(phoneNumber) {
+            window.parent.postMessage({
+                cmd: 'callPhone',
+                params: {
+                    success: true,
+                    data: phoneNumber
+                }
+            }, '*');
+        }
+        window.onload = function () {
+            let elements = document.getElementsByTagName('a')
+            for (let i = 0; i < elements.length; i++) {
+                elements[i].target = '_blank'
+            }
+        }
+    </script>
+</head>
+<body>
+<div class="wrap">
+    <div id="content-div">
+        <a target="_parent" href = "tel://1-408-555-5555">1-408-555-5555</a>
+        <div onclick="callPhone('13192232102')">13192232102</div>
+<!--        <tabel>-->
+<!--            <th>-->
+<!--                <td>asd</td>-->
+<!--                <td>asd</td>-->
+<!--                <td>asd</td>-->
+<!--            </th>-->
+<!--            <tr>-->
+<!--                <td>123</td>-->
+<!--                <td>123</td>-->
+<!--                <td>123</td>-->
+<!--                <td>123</td>-->
+<!--            </tr>-->
+<!--        </tabel>-->
+<!--        asdsaf asdsa sad asdas fasf sasa\\asdsad as\asd asdas\ as\das\d ''asd as'dsa \asd asdas\ as\das\d ''asd as'dsa \asd asdas\ as\das\d ''asd as'dsa \asd asdas\ as\das\d ''asd as'dsa \asd asdas\ as\das\d ''asd as'dsa \asd asdas\ as\das\d ''asd as'dsa \asd asdas\ as\das\d ''asd as'dsa \asd asdas\ as\das\d ''asd as'dsa \asd asdas\ as\das\d ''asd as'dsa \asd-->
+    </div>
+</div>
+</body>
+</html>

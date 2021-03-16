@@ -1,0 +1,47 @@
+{
+    "baseRoute": "",
+    "routes": [
+        {
+            "name": "测试接口",
+            "url": "/getName",
+            "method": "GET",
+            "request": {
+                "name": ""
+            },
+            "response": {
+                "name": {
+                    "isMockConfig": true,
+                    "isRequest": false,
+                    "requestKey": "name",
+                    "isRandom": true,
+                    "randomType": "string",
+                    "defaultValue": "abc"
+                }
+            }
+        },
+        {
+            "name": "测试接口1",
+            "url": "/getName2",
+            "method": "GET",
+            "request": {
+                "name": ""
+            },
+            "response": {
+                "name": "1233333",
+                "sex": "man",
+                "addr": "guangzhou"
+            }
+        },
+        {
+            "name": "测试接口2",
+            "url": "/setName",
+            "method": "POST",
+            "request": {
+                "name": ""
+            },
+            "response": {
+                "name": "zhangfx"
+            }
+        }
+    ]
+}
