@@ -1,11 +1,61 @@
 import * as Router from 'koa-router';
 import createRoutes from '../utils/create-routes';
+import { randomString } from '../utils/random'
 // 引入生成路由的json数据
 const routes = require('../../data/routes.json');
+const mysql = require("mysql");
 
 const router = new Router({
     prefix: routes.baseRoute ? `/${routes.baseRoute}` : '',
 });
+const db_config = {
+    host: "localhost",
+    user: "root",
+    password: "root",
+    database: "diarydb"
+}
+const connect = mysql.createConnection(db_config);
+//开始链接数据库
+connect.connect(function (err: any) {
+    if (err) {
+        console.log(`mysql连接失败: ${err}!`);
+    } else {
+        console.log("mysql连接成功!");
+    }
+});
+
+//假数据库
+const dialyEvents = [{
+    date: new Date("2021-03-22 13:00:00").getTime(),
+    wether: "Sun",
+    mood: "happy",
+    text: "today is a good day",
+    hours: 12,
+    minutes: 30,
+}, {
+    date: new Date("2021-03-20 13:00:00").getTime(),
+    wether: "Rain",
+    mood: "sad",
+    text: "today is not a good day",
+    hours: 11,
+    minutes: 10,
+}, {
+    date: new Date("2021-03-19 13:00:00").getTime(),
+    wether: "Cloud",
+    mood: "upset",
+    text: "Interim reply",
+    hours: 8,
+    minutes: 30,
+}, {
+    date: new Date("2020-10-10 13:00:00").getTime(),
+    wether: "Cloud",
+    mood: "upset",
+    text: "Interim reply eric",
+    hours: 8,
+    minutes: 30,
+}]
+
+
 router.get('/', async (ctx) => {
     const str: string = 'Hello Typescript';
     ctx.body = str;
@@ -13,51 +63,117 @@ router.get('/', async (ctx) => {
 
 //登录
 router.post('/login', async (ctx) => {
-    console.log(ctx)
-    let response: { data: { userToken: string }; success: boolean; errorMessage: null; errorCode: null };
+    
+    //@ts-ignore
+    console.log(ctx.request.body);
+    //@ts-ignore
+    var username = ctx.request.body.username;
+    //@ts-ignore
+    var password = ctx.request.body.password;
+    var isSearch;
+
+    let sqlQuery = "select * from users where username='"+username+"'";
+    connect.query(sqlQuery, function (err: any, result: any) {
+        if (err) {
+            console.log(`SQL error: ${err}!`);
+        } else {
+            console.log(result[0].password);
+            if(result[0].password == password){
+                isSearch = true;
+            }else{
+                isSearch = false;
+            }
+        }
+    });
+
+    var response: { data: { userToken: string }; success: boolean;};
+    console.log(isSearch)
+    if(isSearch){
+        response = {
+            success: true,
+            data: {
+                userToken: randomString(),
+            },
+        };
+    }else{
+        response = {
+            success: false,
+            data: {
+                userToken: '',
+            },
+        };
+    }
+    ctx.body = response;
+});
+
+//获取日记
+router.get('/getevents', async (ctx) => {
+    let response: { data: Array<{ date: number; wether: string; mood: string; text: string; hours: number; minutes: number; }>; success: boolean; errorMessage: null; errorCode: null };
     response = {
         success: true,
         errorCode: null,
         errorMessage: null,
-        data: {
-            userToken: 'aoxy',
-        },
+        data: dialyEvents,
     };
     ctx.body = response;
 });
 
-//拿日记
-router.get('/getevents', async (ctx) => {
-    let response: { data: Array<{ date: number; wether: string; mood: string; text: string ;hours:number; minutes:number;}>; success: boolean; errorMessage: null; errorCode: null };
+//新增文字
+router.post('/createWord', async (ctx) => {
+    //@ts-ignore
+    console.log(ctx.request.body)
+    let response: { success: boolean; errorMessage: null; errorCode: null };
+    response = {
+        success: true,
+        errorCode: null,
+        errorMessage: null,
+    };
+    ctx.body = response;
+});
+
+//删除日记
+router.post('/deleteWord', async (ctx) => {
+    dialyEvents.splice(2, 1)
+    //@ts-ignore
+    console.log(ctx.request.body)
+    let response: { success: boolean; errorMessage: null; errorCode: null };
+    response = {
+        success: true,
+        errorCode: null,
+        errorMessage: null,
+    };
+    ctx.body = response;
+});
+
+//查找日记
+router.post('/search', async (ctx) => {
+    //@ts-ignore
+    console.log(ctx.request.body)
+    let response: { data: Array<{ date: number; wether: string; mood: string; text: string; hours: number; minutes: number; }>; success: boolean; errorMessage: null; errorCode: null };
     response = {
         success: true,
         errorCode: null,
         errorMessage: null,
         data: [{
-            date: new Date().getTime(),
-            wether:"Sun",
-            mood:"happy",
-            text:"today is a good day",
-            hours: 12,
-            minutes: 30,
-          },{
-            date: new Date().getTime(),
-            wether:"Rain",
-            mood:"sad",
-            text:"today is not a good day",
-            hours: 11,
-            minutes: 10,
-          },{
             date: new Date("2021-03-19 13:00:00").getTime(),
-            wether:"Cloud",
-            mood:"angry",
-            text:"Interim reply",
+            wether: "Cloud",
+            mood: "upset",
+            text: "Interim reply",
             hours: 8,
             minutes: 30,
-          },],
+        },]
     };
     ctx.body = response;
 });
+
+
+
+
+
+
+
+
+
 
 // SR
 router.get('/osp/api/sr/outstanding', async (ctx) => {
@@ -351,8 +467,8 @@ router.get('/osp/api/sr/mainCategory', async (ctx) => {
         errorMessage: null,
         data: {
             mainCategory: [
-                {code: 'IRIS-4', description: 'IRIS-4'},
-                {code: 'Security', description: 'Security'},
+                { code: 'IRIS-4', description: 'IRIS-4' },
+                { code: 'Security', description: 'Security' },
             ],
         },
     };
@@ -718,7 +834,7 @@ router.get('/oceanstore_prs/external/api/version/latest', async (ctx) => {
                 'Some minor UI adjustments',
             ],
         },
-    };    ctx.body = response;
+    }; ctx.body = response;
 });
 
 createRoutes(router, routes);
