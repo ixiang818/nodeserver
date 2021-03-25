@@ -13,6 +13,7 @@
   "author": "zhangfx",
   "license": "MIT",
   "dependencies": {
+    "async": "^3.2.0",
     "koa": "^2.6.2",
     "koa-bodyparser": "^4.3.0",
     "koa-cors": "0.0.16",
