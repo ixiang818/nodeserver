@@ -69,6 +69,24 @@ router.post('/createWord', async (ctx) => {
     ctx.body = response;
 });
 
+//更新文字（√）
+router.post('/updateWord', async (ctx) => {
+    //@ts-ignore
+    console.log(ctx.request.body)
+    //@ts-ignore
+    var params = ctx.request.body
+    var conditionParams = {
+        id: params['id']
+    }
+    let result = await query(`UPDATE word_diary SET ? WHERE ?`, [params, conditionParams]);
+    console.log(result);
+    var response = {
+        success: true,
+        message: 'update success'
+    };
+    ctx.body = response;
+});
+
 //删除日记(√)
 router.post('/deleteWord', async (ctx) => {
     //@ts-ignore
